@@ -3,7 +3,7 @@
 # NOTE this has stoppned working, sadly.
 
 # You location. Find a string that works for you by Googling on "weather in <location-string>"
-location="Lund, Sweden"
+location="Auckland, New Zealand"
 
 # Can be any of {c,f,k}.
 unit="c"

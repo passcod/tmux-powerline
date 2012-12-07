@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+~/tmux-powerline/segments/battery tmux
+exit
+
 HEART_CONNECTED=♥
 HEART_DISCONNECTED=♡
 
@@ -19,9 +22,9 @@ case $(uname -s) in
                     export extconnect=$value;;
             esac
             if [[ -n $maxcap && -n $curcap && -n $extconnect ]]; then
-                if [[ "$curcap" == "$maxcap" ]]; then
-                    exit
-                fi
+                #if [[ "$curcap" == "$maxcap" ]]; then
+                #    exit
+                #fi
                 charge=$(( 100 * $curcap / $maxcap ))
                 if [[ "$extconnect" == "Yes" ]]; then
                     echo $HEART_CONNECTED "$charge%"

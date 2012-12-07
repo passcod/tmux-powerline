@@ -32,7 +32,7 @@ mail_count+=(["script"]="${segments_path}/mail_count_maildir.sh")
 mail_count+=(["foreground"]="white")
 mail_count+=(["background"]="red")
 mail_count+=(["separator"]="${separator_left_bold}")
-register_segment "mail_count"
+#register_segment "mail_count"
 
 declare -A now_playing
 if [ "$PLATFORM" == "linux" ]; then
@@ -51,7 +51,7 @@ if [[ ${now_playing["script"]} ]]; then
 	now_playing+=(["foreground"]="colour37")
 	now_playing+=(["background"]="colour234")
 	now_playing+=(["separator"]="${separator_left_bold}")
-	register_segment "now_playing"
+	#register_segment "now_playing"
 fi
 
 declare -A cpu
@@ -66,7 +66,7 @@ load+=(["script"]="${segments_path}/load.sh")
 load+=(["foreground"]="colour167")
 load+=(["background"]="colour237")
 load+=(["separator"]="${separator_left_bold}")
-register_segment "load"
+#register_segment "load"
 
 declare -A battery
 if [ "$PLATFORM" == "mac" ]; then
@@ -75,9 +75,20 @@ else
 	battery+=(["script"]="${segments_path}/battery.sh")
 fi
 battery+=(["foreground"]="colour127")
-battery+=(["background"]="colour137")
-battery+=(["separator"]="${separator_left_bold}")
-#register_segment "battery"
+battery+=(["background"]="colour235")
+battery+=(["separator"]="")
+register_segment "battery"
+
+declare -A temperature
+if [ "$PLATFORM" == "mac" ]; then
+	temperature+=(["script"]="${segments_path}/temperature_mac.sh")
+else
+	temperature+=(["script"]="${segments_path}/temperature.sh")
+fi
+temperature+=(["foreground"]="colour255")
+temperature+=(["background"]="colour127")
+temperature+=(["separator"]="${separator_left_bold}")
+register_segment "temperature"
 
 declare -A weather
 weather+=(["script"]="${segments_path}/weather_yahoo.sh")
@@ -101,7 +112,7 @@ date_day+=(["script"]="${segments_path}/date_day.sh")
 date_day+=(["foreground"]="colour136")
 date_day+=(["background"]="colour235")
 date_day+=(["separator"]="${separator_left_bold}")
-register_segment "date_day"
+#register_segment "date_day"
 
 declare -A date_full
 date_full+=(["script"]="${segments_path}/date_full.sh")
@@ -109,7 +120,7 @@ date_full+=(["foreground"]="colour136")
 date_full+=(["background"]="colour235")
 date_full+=(["separator"]="${separator_left_thin}")
 date_full+=(["separator_fg"]="default")
-register_segment "date_full"
+#register_segment "date_full"
 
 declare -A time
 time+=(["script"]="${segments_path}/time.sh")
@@ -117,7 +128,7 @@ time+=(["foreground"]="colour136")
 time+=(["background"]="colour235")
 time+=(["separator"]="${separator_left_thin}")
 time+=(["separator_fg"]="default")
-register_segment "time"
+#register_segment "time"
 
 # Print the status line in the order of registration above.
 print_status_line_right

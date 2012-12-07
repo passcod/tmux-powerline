@@ -3,12 +3,15 @@
 
 # You location. Find a code that works for you:
 # 1. Go to Yahoo weather http://weather.yahoo.com/
-# 2. Find the weather for you location
+# 2. Find the weather for your location
 # 3. Copy the last numbers in that URL. e.g. "http://weather.yahoo.com/united-states/california/newport-beach-12796587/" has the number "12796587"
-location="12796587"
+
+#location="2351368"  # WHG
+location="29345809" # AKL
+#location="29345744" # WLG
 
 # Can be any of {c,f,k}.
-unit="f"
+unit="c"
 
 # The update period in seconds.
 update_period=600
@@ -16,11 +19,20 @@ update_period=600
 # Cache file.
 tmp_file="${tp_tmpdir}/weather_yahoo.txt"
 
+# Error symbol
+error_sym="¡! "
+
+if ! $(ping -qc 1 -t 1 weather.yahoo.com &>/dev/null); then
+    echo "$error_sym"
+    exit 0
+fi
+
+
 # Get symbol for condition. Available conditions: http://developer.yahoo.com/weather/#codes
 get_condition_symbol() {
     local condition=$(echo "$1" | tr '[:upper:]' '[:lower:]')
     case "$condition" in
-    "sunny" | "hot")
+    "32" | "36") # sunny
         hour=$(date +%H)
         if [ "$hour" -ge "22" -o "$hour" -le "5" ]; then
             #echo "☽"
@@ -30,35 +42,36 @@ get_condition_symbol() {
             echo "☼"
         fi
         ;;
-    "rain" | "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "drizzle" | "freezing rain" | "showers" | "mixed rain and hail" | "scattered showers" | "isolated thundershowers" | "thundershowers")
-            #echo "☂"
-            echo "☔"
+    "5" | "6" | "8" | "9" | "10" | "11" | "12" | "35" | "40" | "45" | "47") # rainy
+            echo "☂"
+            #echo "☔"
         ;;
-    "snow" | "mixed snow and sleet" | "snow flurries" | "light snow showers" | "blowing snow" | "sleet" | "hail" | "heavy snow" | "scattered snow showers" | "snow showers")
+    "7" | "13" | "14" | "15" | "16" | "17" | "18" | "35" | "41" | "42" | "43" | "46") # snowy
             #echo "☃"
             echo "❅"
         ;;
-    "cloudy" | "mostly cloudy" | "partly cloudy")
+    "26" | "27" | "28" | "29" | "30" | "44") # cloudy
         echo "☁"
         ;;
-    "tornado" | "tropical storm" | "hurricane" | "severe thunderstorms" | "thunderstorms" | "isolated thunderstorms" | "scattered thunderstorms")
+    "0" | "1" | "2" | "3" | "4" | "37" | "38" | "39") # stormy
             #echo "⚡"
             echo "☈"
         ;;
-    "dust" | "foggy" | "haze" | "smoky" | "blustery" | "mist")
+    "19" | "20" | "21" | "22" | "23") # foggy
         #echo "♨"
         #echo "﹌"
         echo "〰"
         ;;
-    "windy")
+    "24") # windy
         #echo "⚐"
-        echo "⚑"
+        #echo "⚑"
+        echo "☄"
         ;;
-    "clear" | "fair" | "cold")
+    "25" | "31" | "33" | "34") # clear,fair,cold
         #echo "✈"    # So clear you can see the aeroplanes!
         echo "〇"
         ;;
-    *)
+    "3200" | *)
         echo "？"
         ;;
     esac
@@ -96,19 +109,22 @@ if [ -z "$degree" ]; then
     if [ "$?" -eq "0" ]; then
         error=$(echo "$weather_data" | grep "problem_cause\|DOCTYPE");
         if [ -n "$error" ]; then
-            echo "error"
-            exit 1
+            echo "$error_sym"
+            exit 0
         fi
 # <yweather:units temperature="F" distance="mi" pressure="in" speed="mph"/>
     unit=$(echo "$weather_data" | grep -PZo "<yweather:units [^<>]*/>" | sed 's/.*temperature="\([^"]*\)".*/\1/')
     condition=$(echo "$weather_data" | grep -PZo "<yweather:condition [^<>]*/>")
 # <yweather:condition  text="Clear"  code="31"  temp="66"  date="Mon, 01 Oct 2012 8:00 pm CST" />
     degree=$(echo "$condition" | sed 's/.*temp="\([^"]*\)".*/\1/')
-    condition=$(echo "$condition" | sed 's/.*text="\([^"]*\)".*/\1/')
+    condition=$(echo "$condition" | sed 's/.*code="\([^"]*\)".*/\1/')
         echo "$degree" > $tmp_file
         echo "$condition" >> $tmp_file
     elif [ -f "$tmp_file" ]; then
         read_tmp_file
+    else
+	echo "$error_sym"
+	exit 0
     fi
 fi
 
